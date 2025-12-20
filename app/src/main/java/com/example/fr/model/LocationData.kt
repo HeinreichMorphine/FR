@@ -8,5 +8,7 @@ data class LocationData(
     val latitude: Double,
     val longitude: Double,
     val reportedTime: String,
-    val reportedBy: String
+    val reportedBy: String,
+    val description: String = "",
+    val verificationCount: Int = 0
 )

@@ -59,7 +59,7 @@ fun MainScreen(name: String) {
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
             NavHost(navController = navController, startDestination = "home") {
-                composable("home") { HomeScreen(name = name) }
+                composable("home") { HomeScreen(name = name, navController = navController) }
                 composable("profile") { ProfileScreen(profileViewModel = profileViewModel) }
                 composable("settings") { SettingsScreen(navController = navController) }
                 composable("edit_profile") { EditProfileScreen(navController = navController, profileViewModel = profileViewModel) }

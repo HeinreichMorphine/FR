@@ -6,6 +6,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.fr.ui.screens.AuthScreen
 import com.example.fr.ui.screens.HomeScreen
+import com.example.fr.ui.screens.NewsScreen
+
+import com.example.fr.ui.screens.AboutScreen
 
 @Composable
 fun Navigation() {
@@ -16,7 +19,13 @@ fun Navigation() {
         }
         composable("home/{name}") { backStackEntry ->
             val name = backStackEntry.arguments?.getString("name") ?: "User"
-            HomeScreen(name = name)
+            HomeScreen(name = name, navController = navController)
+        }
+        composable("news") {
+            NewsScreen(navController = navController)
+        }
+        composable("about") {
+            AboutScreen(navController = navController)
         }
     }
 }

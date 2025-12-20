@@ -22,6 +22,7 @@ import androidx.navigation.NavController
 fun AuthScreen(navController: NavController) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var name by remember { mutableStateOf("") }
     var isLogin by remember { mutableStateOf(true) }
 
     Column(
@@ -32,6 +33,13 @@ fun AuthScreen(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(text = if (isLogin) "Login" else "Register", style = androidx.compose.material3.MaterialTheme.typography.headlineLarge)
+
+        OutlinedTextField(
+            value = name,
+            onValueChange = { name = it },
+            label = { Text("Full Name") },
+            modifier = Modifier.padding(vertical = 8.dp)
+        )
 
         OutlinedTextField(
             value = email,
@@ -49,7 +57,7 @@ fun AuthScreen(navController: NavController) {
         )
 
         Button(
-            onClick = { navController.navigate("home/$email") },
+            onClick = { navController.navigate("home/$name") },
             modifier = Modifier.padding(vertical = 16.dp)
         ) {
             Text(text = if (isLogin) "Login" else "Register")
