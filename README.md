@@ -4,7 +4,7 @@ This is the backend and administrator dashboard for the Flood Rescue Android App
 
 ## 🚀 For Collaborators: Installation Guide
 
-**Important:** This repository **includes** the `.env` configuration file for convenience, but **excludes** the `vendor/` dependency folder. You **MUST** run `composer install` to set up the project.
+**Important:** This repository **excludes** the `.env` configuration file and the `vendor/` dependency folder for security and efficiency. You **MUST** run `composer install` and set up your own environment file.
 
 ### 1. Prerequisites
 - **Laragon** (recommended).
@@ -31,7 +31,15 @@ npm install
 3.  Create a new Database named **`fr`**.
 
 #### D. Verify Environment (.env)
-The `.env` file is included. Ensure the database settings match your local setup:
+1. Copy the example environment file:
+   ```bash
+   cp .env.example .env
+   ```
+2. Generate an application key:
+   ```bash
+   php artisan key:generate
+   ```
+3. Ensure the database settings match your local setup:
 
 ```env
 DB_CONNECTION=mysql
@@ -42,7 +50,7 @@ DB_USERNAME=root    <-- Your SQLYog username
 DB_PASSWORD=        <-- Your SQLYog password (leave blank if none)
 ```
 
-**Note:** Since the `.env` file is included in the repo, be careful not to push your local secrets if you change them for production.
+**Note:** The `.env` file is ignored by Git to protect your local credentials and secrets.
 
 #### D. Run Migrations
 To create the tables (Shelters, Reports, News, Users) in your new `fr` database:
@@ -71,19 +79,8 @@ Access the Admin Panel at: [http://localhost:8000/admin](http://localhost:8000/a
 - **Email:** `admin@admin.com`
 - **Password:** `password`
 
-### 4. Admin Installation & Troubleshooting
 
-#### Resolving "Route [filament.admin.pages.dashboard] not defined"
-If you encounter this error (due to conflicting Filament installation):
-1.  Run `composer remove filament/filament`
-2.  Delete `app/Providers/Filament` folder
-3.  Remove `App\Providers\Filament\AdminPanelProvider::class` from `bootstrap/providers.php`.
-4.  Run `php artisan route:clear`
-
-#### Resolving "Unable to locate a class or view for component [admin-layout]"
-Run `composer dump-autoload` if you have added new class files manually, or check that `app/View/Components/AdminLayout.php` exists.
-
-### 5. API Endpoints (For Mobile App)
+### 4. API Endpoints (For Mobile App)
 
 The mobile app connects to these endpoints:
 
@@ -94,7 +91,8 @@ The mobile app connects to these endpoints:
 | `GET` | `/api/news` | Get list of announcements |
 | `GET` | `/api/shelters` | Get list of official shelters |
 
-### 6. Mobile App Setup (Android)
+
+### 5. Mobile App Setup (Android)
 
 1.  Open the Android project in Android Studio.
 2.  Update `MapViewModel.kt`:
@@ -103,7 +101,8 @@ The mobile app connects to these endpoints:
 3.  Ensure `AndroidManifest.xml` has `android:usesCleartextTraffic="true"` and Internet permissions.
 
 
-### 7. Known Limitations & Future Work
+
+### 6. Known Limitations & Future Work
 
 *   **Mobile User Authentication**: Currently, the mobile app's "Login" and "Register" screens are **simulated**.
     *   Mobile users are **NOT** stored in the SQL database or Firebase.
