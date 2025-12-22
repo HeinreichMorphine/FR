@@ -8,6 +8,7 @@ import io.ktor.client.call.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
+import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,23 +29,34 @@ class MapViewModel : ViewModel() {
 
     private val client = HttpClient(CIO) {
         install(ContentNegotiation) {
-            json()
+            json(kotlinx.serialization.json.Json {
+                ignoreUnknownKeys = true
+                prettyPrint = true
+                isLenient = true
+            })
         }
     }
+
+
+    // Replace with your actual local IP if running on physical device
+    // Use port 8000 for php artisan serve
+    private val BASE_URL = "http://10.0.2.2:8000/api/"
 
     init {
         // Observe changes to allLocations or selectedFilters and update _locations
         viewModelScope.launch {
             kotlinx.coroutines.flow.combine(_allLocations, _selectedFilters) { all, filters ->
                 if (filters.isEmpty()) {
-                    emptyList() // Or all if you prefer showing everything when nothing selected, but usually empty implies no selection
+                    emptyList() 
                 } else {
-                    all.filter { it.type in filters }
+                    val normalizedFilters = filters.map { it.lowercase() }.toSet()
+                    all.filter { it.type.lowercase() in normalizedFilters }
                 }
             }.collect { filtered ->
                 _locations.value = filtered
             }
         }
+        fetchLocations()
     }
 
     fun toggleFilter(type: String) {
@@ -58,39 +70,64 @@ class MapViewModel : ViewModel() {
 
     fun fetchLocations() {
         viewModelScope.launch {
-            // Mock data for Malaysia (Kuala Lumpur area)
-            val fetched = listOf(
-                LocationData("Flood", 3.140853, 101.693207, "2024-12-20 10:00", "Admin", "Flooding at Dataran Merdeka"),
-                LocationData("Shelter", 3.1390, 101.6869, "2024-12-20 09:00", "System", "Shelter at National Mosque"),
-                LocationData("Blocked", 3.1579, 101.7116, "2024-12-20 11:30", "User1", "Road blocked near KLCC")
-            )
-            _allLocations.value = fetched
+            try {
+                // Fetch reports
+                val reports: List<LocationData> = try {
+                    client.get("${BASE_URL}reports").body()
+                } catch (e: Exception) { emptyList() }
+
+                // Fetch shelters
+                val shelters: List<LocationData> = try {
+                    client.get("${BASE_URL}shelters").body()
+                } catch (e: Exception) { emptyList() }
+
+                // Combine both lists
+                _allLocations.value = reports + shelters
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 
     fun reportIncident(type: String, description: String, lat: Double, lng: Double, user: String) {
-        val newLocation = LocationData(
-            type = type,
-            latitude = lat,
-            longitude = lng,
-            reportedTime = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", java.util.Locale.getDefault()).format(java.util.Date()),
-            reportedBy = user,
-            description = description
-        )
-        _allLocations.value = _allLocations.value + newLocation
+        viewModelScope.launch {
+            try {
+                val newLocation = LocationData(
+                    type = type,
+                    latitude = lat,
+                    longitude = lng,
+                    reportedTime = "", // Server handles time
+                    reportedBy = user,
+                    description = description
+                )
+                
+                // Post to server
+                val response: LocationData = client.post("${BASE_URL}reports") {
+                    contentType(ContentType.Application.Json)
+                    setBody(newLocation)
+                }.body()
+
+                // Update local list with response (which should have ID and Time)
+                _allLocations.value = _allLocations.value + response
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 
     fun verifyLocation(location: LocationData, isUpvote: Boolean) {
-        val updatedList = _allLocations.value.map {
-            if (it == location) {
-                // In a real app, we would send this to the server.
-                // Here we just increment/decrement locally for the demo.
-                val change = if (isUpvote) 1 else -1
-                it.copy(verificationCount = it.verificationCount + change)
-            } else {
-                it
+        // Implementation for verification API would go here
+        viewModelScope.launch {
+             // Mock local update for now until API supports it
+            val updatedList = _allLocations.value.map {
+                if (it == location) {
+                    val change = if (isUpvote) 1 else -1
+                    it.copy(verificationCount = it.verificationCount + change)
+                } else {
+                    it
+                }
             }
+            _allLocations.value = updatedList
         }
-        _allLocations.value = updatedList
     }
 }
