@@ -1,25 +1,18 @@
 <?php
 
-namespace App\Filament\Resources\Locations\Schemas;
+namespace App\Filament\Resources\Shelters\Schemas;
 
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 
-class LocationForm
+class ShelterForm
 {
-    public static function configure(Schema $schema): Schema
+    public static function configure(Form $form): Form
     {
-        return $schema
-            ->components([
+        return $form
+            ->schema([
                 \Filament\Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
-                \Filament\Forms\Components\Select::make('type')
-                    ->options([
-                        'shelter' => 'Safe Shelter',
-                        'blocked_road' => 'Blocked Road',
-                        'other' => 'Other',
-                    ])
-                    ->required(),
                 \Filament\Forms\Components\Textarea::make('description')
                     ->required()
                     ->columnSpanFull(),

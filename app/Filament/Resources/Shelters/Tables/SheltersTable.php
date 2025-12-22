@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Filament\Resources\Locations\Tables;
+namespace App\Filament\Resources\Shelters\Tables;
 
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Table;
 
-class LocationsTable
+class SheltersTable
 {
     public static function configure(Table $table): Table
     {
@@ -15,12 +15,6 @@ class LocationsTable
             ->columns([
                 \Filament\Tables\Columns\TextColumn::make('name')
                     ->searchable(),
-                \Filament\Tables\Columns\TextColumn::make('type')
-                    ->badge()
-                    ->colors([
-                        'success' => 'shelter',
-                        'danger' => 'blocked_road',
-                    ]),
                 \Filament\Tables\Columns\TextColumn::make('description')
                     ->limit(50),
                 \Filament\Tables\Columns\TextColumn::make('latitude'),
@@ -33,10 +27,10 @@ class LocationsTable
             ->filters([
                 //
             ])
-            ->recordActions([
+            ->actions([
                 EditAction::make(),
             ])
-            ->toolbarActions([
+            ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),

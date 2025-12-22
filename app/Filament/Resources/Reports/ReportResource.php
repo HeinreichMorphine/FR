@@ -9,8 +9,8 @@ use App\Filament\Resources\Reports\Schemas\ReportForm;
 use App\Filament\Resources\Reports\Tables\ReportsTable;
 use App\Models\Report;
 use BackedEnum;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
@@ -19,29 +19,31 @@ class ReportResource extends Resource
 {
     protected static ?string $model = Report::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return ReportForm::configure($schema);
+        return ReportForm::configure($form);
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                TextColumn::make('user.name')->label('Reported By'),
+                TextColumn::make('user_name')->label('Reported By')->searchable(),
                 TextColumn::make('incident_type')
                     ->badge()
                     ->colors([
                         'danger' => 'Request Help',
                         'warning' => 'Flood',
+                        'success' => 'Safe',
+                        'info' => 'Traffic',
                     ]),
                 TextColumn::make('description')->limit(50),
                 TextColumn::make('user_agent')->label('Device Info')->toggleable(),
                 TextColumn::make('latitude'),
                 TextColumn::make('longitude'),
-                TextColumn::make('created_at')->dateTime(), // Time/Date
+                TextColumn::make('report_time')->dateTime()->sortable(),
             ]);
     }
 

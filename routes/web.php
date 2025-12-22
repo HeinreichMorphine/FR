@@ -17,6 +17,20 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+// Admin Routes
+Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', function () {
+        return redirect()->route('admin.reports.index');
+    })->name('dashboard');
+
+    Route::resource('shelters', App\Http\Controllers\Admin\ShelterController::class);
+    Route::resource('news', App\Http\Controllers\Admin\NewsController::class);
+    
+    Route::get('reports', [App\Http\Controllers\Admin\ReportController::class, 'index'])->name('reports.index');
+    Route::get('reports/{report}', [App\Http\Controllers\Admin\ReportController::class, 'show'])->name('reports.show');
+    Route::patch('reports/{report}/status', [App\Http\Controllers\Admin\ReportController::class, 'updateStatus'])->name('reports.updateStatus');
+});
+
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\FloodController;
 

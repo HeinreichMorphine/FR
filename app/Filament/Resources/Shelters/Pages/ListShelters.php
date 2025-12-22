@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Filament\Resources\Locations\Pages;
+namespace App\Filament\Resources\Shelters\Pages;
 
-use App\Filament\Resources\Locations\LocationResource;
+use App\Filament\Resources\Shelters\ShelterResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 
-class ListLocations extends ListRecords
+class ListShelters extends ListRecords
 {
-    protected static string $resource = LocationResource::class;
+    protected static string $resource = ShelterResource::class;
 
     protected function getHeaderActions(): array
     {

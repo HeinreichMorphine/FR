@@ -13,10 +13,14 @@ return new class extends Migration
     {
         Schema::create('reports', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Who reported it
-            $table->string('incident_type'); // Flood, Request Help
+            $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade'); // Enable nullable if anonymous
+            $table->string('user_name'); // Requested in spec
+            $table->string('incident_type', 50); // Spec: 50 chars
             $table->text('description');
-            $table->string('user_agent')->nullable(); // Required by assignment 
+            $table->string('user_agent')->nullable();
+            $table->integer('verification_count')->default(0); // Spec: Default 0
+            $table->string('status')->default('Active'); // Spec: Default 'Active'
+            $table->timestamp('report_time')->useCurrent(); // Spec: report_time 
             $table->decimal('latitude', 10, 8);
             $table->decimal('longitude', 11, 8);
             $table->timestamps(); // Handles time/date automatically

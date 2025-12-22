@@ -11,11 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('locations', function (Blueprint $table) {
+        Schema::create('shelters', function (Blueprint $table) {
             $table->id();
             $table->string('name'); // e.g., "SMK School Shelter"
             $table->text('description');
-            $table->string('type'); // e.g., "shelter", "blocked_road"
             $table->decimal('latitude', 10, 8);
             $table->decimal('longitude', 11, 8);
             $table->timestamps();
@@ -27,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('locations');
+        Schema::dropIfExists('shelters');
     }
 };
