@@ -52,6 +52,7 @@ php artisan migrate:fresh --seed
 ```
 *This command will also create a default Admin user.*
 
+
 ### 3. Running the Application
 
 You need to run two commands in parallel terminals:
@@ -69,6 +70,45 @@ php artisan serve
 Access the Admin Panel at: [http://localhost:8000/admin](http://localhost:8000/admin)
 - **Email:** `admin@admin.com`
 - **Password:** `password`
+
+### 4. Admin Installation & Troubleshooting
+
+#### Resolving "Route [filament.admin.pages.dashboard] not defined"
+If you encounter this error (due to conflicting Filament installation):
+1.  Run `composer remove filament/filament`
+2.  Delete `app/Providers/Filament` folder
+3.  Remove `App\Providers\Filament\AdminPanelProvider::class` from `bootstrap/providers.php`.
+4.  Run `php artisan route:clear`
+
+#### Resolving "Unable to locate a class or view for component [admin-layout]"
+Run `composer dump-autoload` if you have added new class files manually, or check that `app/View/Components/AdminLayout.php` exists.
+
+### 5. API Endpoints (For Mobile App)
+
+The mobile app connects to these endpoints:
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `POST` | `/api/reports` | Submit a new incident report |
+| `GET` | `/api/reports` | Get list of all incident reports |
+| `GET` | `/api/news` | Get list of announcements |
+| `GET` | `/api/shelters` | Get list of official shelters |
+
+### 6. Mobile App Setup (Android)
+
+1.  Open the Android project in Android Studio.
+2.  Update `MapViewModel.kt`:
+    *   Set `BASE_URL = "http://10.0.2.2/FR/public/api/"` (for Emulator)
+    *   Set `BASE_URL = "http://<YOUR_LAN_IP>/FR/public/api/"` (for Physical Device)
+3.  Ensure `AndroidManifest.xml` has `android:usesCleartextTraffic="true"` and Internet permissions.
+
+
+### 7. Known Limitations & Future Work
+
+*   **Mobile User Authentication**: Currently, the mobile app's "Login" and "Register" screens are **simulated**.
+    *   Mobile users are **NOT** stored in the SQL database or Firebase.
+    *   The app creates a temporary session using the entered name.
+    *   **Future Implementation Needed**: Build API endpoints for user registration/login and implement token-based authentication on the Android client to persist user accounts.
 
 ---
 

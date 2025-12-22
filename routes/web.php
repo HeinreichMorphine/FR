@@ -11,6 +11,11 @@ Route::get('/dashboard', function () {
     return redirect('/admin');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+// Redirect /admin/login to standard login
+Route::get('/admin/login', function () {
+    return redirect('/login');
+});
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -20,7 +25,14 @@ Route::middleware('auth')->group(function () {
 // Admin Routes
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', function () {
-        return redirect()->route('admin.reports.index');
+        $stats = [
+            'reports' => App\Models\Report::count(),
+            'shelters' => App\Models\Shelter::count(),
+            'news' => App\Models\News::count(),
+        ];
+        $recentReports = App\Models\Report::latest()->take(5)->get();
+        
+        return view('admin.dashboard', compact('stats', 'recentReports'));
     })->name('dashboard');
 
     Route::resource('shelters', App\Http\Controllers\Admin\ShelterController::class);
@@ -35,9 +47,12 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\FloodController;
 
 // Public route for login
-Route::get('/login', function () {
-    return redirect('/admin/login');
-})->name('login');
+// Public route for login handled by auth.php
+// Route::get('/login', ...) is defined in auth.php
+
+Route::post('/auth/google', [AuthController::class, 'googleLogin']);
+
+require __DIR__.'/auth.php';
 
 Route::post('/auth/google', [AuthController::class, 'googleLogin']);
 

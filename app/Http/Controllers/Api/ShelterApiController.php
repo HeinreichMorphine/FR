@@ -13,6 +13,19 @@ class ShelterApiController extends Controller
      */
     public function index()
     {
-        return response()->json(Shelter::all(), 200);
+        $shelters = Shelter::all()->map(function ($shelter) {
+            return [
+                'id' => $shelter->id,
+                'incident_type' => 'Shelter', // Critical for app icon
+                'latitude' => (float) $shelter->latitude,
+                'longitude' => (float) $shelter->longitude,
+                'report_time' => $shelter->created_at->toDateTimeString(),
+                'user_name' => $shelter->name, // Use shelter name as reporter
+                'description' => $shelter->description,
+                'verification_count' => 100, // Trusted source
+            ];
+        });
+
+        return response()->json($shelters, 200);
     }
 }

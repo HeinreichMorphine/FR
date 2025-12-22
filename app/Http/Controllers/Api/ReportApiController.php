@@ -33,13 +33,11 @@ class ReportApiController extends Controller
             'latitude' => $validated['latitude'],
             'longitude' => $validated['longitude'],
             'user_agent' => $userAgent,
-            // report_time defaults to now() via database default or we can set it
+            'user_agent' => $userAgent,
+            'report_time' => now(), // Explicitly set time so it returns in response
         ]);
 
-        return response()->json([
-            'message' => 'Report submitted successfully',
-            'data' => $report,
-        ], 201);
+        return response()->json($report, 201);
     }
 
     /**
