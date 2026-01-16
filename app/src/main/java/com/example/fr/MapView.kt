@@ -24,6 +24,7 @@ import com.google.maps.android.compose.MarkerState
 fun MapView(
     mapViewModel: MapViewModel = viewModel(),
     cameraPositionState: CameraPositionState,
+    moveToUserLocation: Boolean = true,
     onMapLongClick: (LatLng) -> Unit = {},
     onMarkerClick: (com.example.fr.model.LocationData) -> Boolean = { false }
 ) {
@@ -39,8 +40,10 @@ fun MapView(
                 permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
             ) {
                 isLocationPermissionGranted = true
-                getCurrentLocation(context) { latLng ->
-                    cameraPositionState.position = com.google.android.gms.maps.model.CameraPosition.fromLatLngZoom(latLng, 15f)
+                if (moveToUserLocation) {
+                    getCurrentLocation(context) { latLng ->
+                        cameraPositionState.position = com.google.android.gms.maps.model.CameraPosition.fromLatLngZoom(latLng, 15f)
+                    }
                 }
             } else {
                 // Handle permission denial
@@ -49,13 +52,14 @@ fun MapView(
     )
 
     LaunchedEffect(Unit) {
-        mapViewModel.fetchLocations()
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
             ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
         ) {
             isLocationPermissionGranted = true
-            getCurrentLocation(context) { latLng ->
-                cameraPositionState.position = com.google.android.gms.maps.model.CameraPosition.fromLatLngZoom(latLng, 15f)
+            if (moveToUserLocation) {
+                getCurrentLocation(context) { latLng ->
+                    cameraPositionState.position = com.google.android.gms.maps.model.CameraPosition.fromLatLngZoom(latLng, 15f)
+                }
             }
         } else {
             requestPermissionLauncher.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
