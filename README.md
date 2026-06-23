@@ -2,6 +2,44 @@
 
 This is the backend and administrator dashboard for the Flood Rescue Android Application. It manages Shelters, Reports, and News/Announcements.
 
+---
+
+## 🛠️ Backend Application Functionality & Architecture
+
+The Web Server application acts as the backend REST API provider and administrative dashboard for the Flood Rescue platform. Here is a breakdown of how the application functions:
+
+### 1. Core Database Models & Schema
+*   **`Shelter`**: Represents designated evacuation/safe zones.
+    *   Fields: `name`, `description`, `latitude`, `longitude`.
+*   **`Report`**: Stores user-submitted flood/incident reports.
+    *   Fields: `user_id` (relates to the reporter), `user_name`, `incident_type` (e.g., Flood, Road Blockage, Mudslide), `description`, `status` (defaults to `Active`, can be marked as `Verified` or `False` by admins), `verification_count`, `report_time`, `latitude`, `longitude`, and `user_agent` (captures device properties).
+*   **`News`**: Contains emergency bulletins and general updates.
+    *   Fields: `title`, `content`, `published_at` timestamp.
+*   **`User`**: Manages credentials for admin panel users and API clients.
+
+### 2. Dual Administrative Portals
+The application is configured with two distinct admin panels for convenience and database moderation:
+*   **Tailwind/Blade Custom Dashboard (`/admin`)**:
+    *   Displays real-time statistics counters (Total Reports, Active Shelters, News Updates).
+    *   Lists recent reports dynamically with badges showing statuses (`Active`, `Verified`, `False`).
+    *   Provides dedicated subpages to edit, delete, and create shelters, news items, and view report details.
+*   **Filament Admin Dashboard**:
+    *   A pre-configured management panel utilizing Filament PHP packages.
+    *   Configures resources for `NewsResource`, `ReportResource`, and `ShelterResource` to manage model data directly.
+    *   Includes a `StatsOverview` widget showing system metrics.
+
+### 3. REST API & Mobile Integration Endpoints
+The backend exposes specific endpoints to support integration with the companion Android mobile client:
+*   **Public API Routes (`routes/api.php`)**:
+    *   `GET /api/shelters`: Fetches all shelters. Note that these are mapped to match the mobile app's map icon format where the `incident_type` is hardcoded to `'Shelter'` and `verification_count` is set to `100` (marking it as a trusted source).
+    *   `GET /api/reports` / `POST /api/reports`: Lists submitted reports or posts a new incident report.
+    *   `GET /api/news`: Fetches published announcements ordered chronologically.
+*   **OAuth & Secure Routes (`routes/web.php`)**:
+    *   `POST /auth/google`: Validates a Google OAuth ID Token sent by the Android client, checks/registers the user in the database, and responds with a Laravel Sanctum personal access token.
+    *   `GET /map-data` / `POST /report`: API endpoints protected by `auth:sanctum` middleware. `getMapData()` returns a combined list of shelters and the 50 most recent incident reports.
+
+---
+
 ## 🚀 For Collaborators: Installation Guide
 
 **Important:** This repository **excludes** the `.env` configuration file and the `vendor/` dependency folder for security and efficiency. You **MUST** run `composer install` and set up your own environment file.
